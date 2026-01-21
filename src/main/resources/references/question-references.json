@@ -1,0 +1,32 @@
+[
+  {
+    "content": "Explain the difference between deep and shallow copying in Java.",
+    "category": "Programming",
+    "complexityScore": 3
+  },
+  {
+    "content": "What are the socio-economic impacts of high-speed rail in urban centers?",
+    "category": "Social Science",
+    "complexityScore": 4
+  },
+  {
+    "content": "Solve for x: 2x^2 - 5x + 3 = 0.",
+    "category": "Mathematics",
+    "complexityScore": 2
+  },
+  {
+    "content": "Describe the process of oxidative phosphorylation in the mitochondria.",
+    "category": "Biology",
+    "complexityScore": 5
+  },
+  {
+    "content": "Who wrote the 1924 novel 'The Magic Mountain'?",
+    "category": "Literature",
+    "complexityScore": 2
+  },
+  {
+    "content": "What were the main causes of the French Revolution?",
+    "category": "History",
+    "complexityScore": 3
+  }
+]

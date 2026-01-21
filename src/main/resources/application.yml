@@ -1,3 +1,53 @@
+butler:
+  ai:
+    generator: openai_gpt_4o
+    judge: anthropic_claude_haiku
+    similarity-threshold: 0.85
+
 spring:
   application:
     name: butlers-eval
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    time-zone: Europe/London
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  docker:
+    compose:
+      enabled: true
+      file: compose.yml
+      lifecycle-management: start-and-stop
+
+  ai:
+    vectorstore:
+      pgvector:
+        index-type: HNSW
+        distance-type: cosine_distance
+        initialize-schema: true
+    ollama:
+      base-url: http://localhost:11434
+      init:
+        pull-model-strategy: never
+        timeout: 5m
+    openai:
+      api-key: ${OPENAI_API_KEY}
+    anthropic:
+      api-key: ${ANTHROPIC_API_KEY}
+
+    model:
+      embedding: openai
+
+logging:
+  level:
+    org:
+      springframework:
+        ai:
+          chat:
+            client:
+              advisor: DEBUG

@@ -1,0 +1,26 @@
+services:
+  ollama:
+    image: 'ollama/ollama:latest'
+    container_name: butler-ollama
+    ports:
+      - '11434:11434'
+    volumes:
+      - ./ollama_data:/root/.ollama
+    entrypoint: [ "/bin/sh", "-c" ]
+    command:
+      - |
+        ollama serve & 
+        sleep 5
+        echo "--- Pulling Lightweight Butler Model ---"
+        ollama pull llama3.2:1b
+        wait
+  pgvector:
+    image: 'pgvector/pgvector:pg16'
+    environment:
+      - 'POSTGRES_DB=butlers'
+      - 'POSTGRES_PASSWORD=be'
+      - 'POSTGRES_USER=be'
+    labels:
+      - "org.springframework.boot.service-connection=postgres"
+    ports:
+      - '5432:5432'
