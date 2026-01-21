@@ -73,10 +73,10 @@ public class QuestionService {
 
         try {
             questionRepository.save(question);
-            log.debug("Saved question to database: {}", question.getId());
+            log.info("Saved question to database: {}", question.getId());
 
             saveToVectorStore(question);
-            log.debug("Saved question to vector store: {}", question.getId());
+            log.info("Saved question to vector store: {}", question.getId());
         } catch (Exception e) {
             log.error("Failed to save question id={}", question.getId());
             throw new QuestionSaveException("Failed to save question: " + e.getMessage());
