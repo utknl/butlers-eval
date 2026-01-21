@@ -16,7 +16,11 @@ public enum LlmProvider {
 
     // Anthropic
     ANTHROPIC_CLAUDE_SONNET("anthropic", "claude-sonnet-4-5-20250929"),
-    ANTHROPIC_CLAUDE_HAIKU("anthropic", "claude-haiku-4-5-20251001");
+    ANTHROPIC_CLAUDE_HAIKU("anthropic", "claude-haiku-4-5-20251001"),
+
+    // Gemini
+    GOOGLE_GEMINI_2_5_FLASH("gemini", "gemini-2.5-flash"),
+    GOOGLE_GEMINI_2_5_PRO("gemini", "gemini-2.5-pro");
 
     private final String providerName;
     private final String modelId;

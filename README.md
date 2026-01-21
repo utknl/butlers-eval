@@ -11,9 +11,10 @@ them in Postgres + pgvector to avoid duplicates.
 ## Requirements
 - Java 21
 - Docker (for Ollama and pgvector services)
-- API keys if using OpenAI or Anthropic:
+- API keys if using OpenAI, Anthropic, or Google:
   - `OPENAI_API_KEY`
   - `ANTHROPIC_API_KEY`
+  - `GOOGLE_API_KEY`
 
 ## Configuration
 - Provider selection lives in `src/main/resources/application.yml` under

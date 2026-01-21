@@ -1,6 +1,6 @@
 butler:
   ai:
-    generator: openai_gpt_4o
+    generator: google_gemini_2_5_pro
     judge: anthropic_claude_haiku
     similarity-threshold: 0.85
 
@@ -38,6 +38,9 @@ spring:
       api-key: ${OPENAI_API_KEY}
     anthropic:
       api-key: ${ANTHROPIC_API_KEY}
+    google:
+      genai:
+        api-key: ${GOOGLE_API_KEY}
 
     model:
       embedding: openai
