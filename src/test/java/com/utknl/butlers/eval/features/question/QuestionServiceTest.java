@@ -18,7 +18,6 @@ import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.core.io.Resource;
 
 import java.util.Collections;
 import java.util.List;
@@ -63,32 +62,32 @@ class QuestionServiceTest {
         when(llmProperties.generator()).thenReturn(LlmProvider.OLLAMA_LLAMA_3_2);
 
         when(deepChatClient.prompt()
-                .system(any(Resource.class))
+                .system(any(Consumer.class))
                 .user(any(Consumer.class))
-                .advisors((Advisor[]) any())
+                .advisors(any(Advisor[].class))
                 .call()
                 .entity(eq(QuestionCandidate.class)))
                 .thenReturn(candidate);
 
-        assertThrows(expectedException, () -> questionService.generateQuestion());
+        assertThrows(expectedException, () -> questionService.generateQuestion(generateQuestionRequest()));
     }
 
     private static Stream<Arguments> provideInvalidCandidates() {
         return Stream.of(
                 Arguments.of("Null Content",
-                        new QuestionCandidate(null, "Category", 3),
+                        new QuestionCandidate(null, Category.ARTIFICIAL_INTELLIGENCE, 3),
                         LlmGenerationException.class),
                 Arguments.of("Blank Content",
-                        new QuestionCandidate("   ", "Category", 3),
+                        new QuestionCandidate("   ", Category.BIOLOGY_HEALTH, 3),
                         LlmGenerationException.class),
                 Arguments.of("Null Category",
                         new QuestionCandidate("Content", null, 3),
                         LlmGenerationException.class),
                 Arguments.of("Complexity Zero",
-                        new QuestionCandidate("Content", "Category", 0),
+                        new QuestionCandidate("Content", Category.CINEMA_TV, 0),
                         LlmGenerationException.class),
                 Arguments.of("Complexity Above Max",
-                        new QuestionCandidate("Content", "Category", 6),
+                        new QuestionCandidate("Content", Category.DATA_ANALYSIS, 6),
                         LlmGenerationException.class)
         );
     }
@@ -96,16 +95,16 @@ class QuestionServiceTest {
     @Test
     void givenDeepMocks_whenGenerateQuestionInvoked_thenQuestionIsCreated() {
         QuestionCandidate expectedCandidate = new QuestionCandidate(
-                "What is polymorphism in OOP?", "Programming", 3);
+                "Test Question", Category.CYBERSECURITY, 3);
 
         ChatClient deepChatClient = mock(ChatClient.class, Answers.RETURNS_DEEP_STUBS);
         when(clientFactory.getClient(any())).thenReturn(deepChatClient);
         when(llmProperties.generator()).thenReturn(LlmProvider.OLLAMA_LLAMA_3_2);
         when(deepChatClient
                 .prompt()
-                .system(any(Resource.class))
+                .system(any(Consumer.class))
                 .user(any(Consumer.class))
-                .advisors(any(Advisor.class))
+                .advisors(any(Advisor[].class))
                 .call()
                 .entity(eq(QuestionCandidate.class)))
                 .thenReturn(expectedCandidate);
@@ -113,16 +112,16 @@ class QuestionServiceTest {
         when(vectorStore.similaritySearch(any(SearchRequest.class))).thenReturn(Collections.emptyList());
         when(questionRepository.save(any(Question.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        Question result = questionService.generateQuestion();
-        assertThat(result.getContent()).isEqualTo("What is polymorphism in OOP?");
+        Question result = questionService.generateQuestion(generateQuestionRequest());
+        assertThat(result.getContent()).isEqualTo("Test Question");
         verify(questionRepository).save(any());
     }
 
     @Test
     void whenGetAllQuestions_thenReturnsAllQuestions() {
         List<Question> mockQuestions = List.of(
-                Question.builder().id(UUID.randomUUID()).content("Q1").category("Cat1").build(),
-                Question.builder().id(UUID.randomUUID()).content("Q2").category("Cat2").build()
+                Question.builder().id(UUID.randomUUID()).content("Q1").category(Category.ARTIFICIAL_INTELLIGENCE).build(),
+                Question.builder().id(UUID.randomUUID()).content("Q2").category(Category.ARTIFICIAL_INTELLIGENCE).build()
         );
         when(questionRepository.findAll()).thenReturn(mockQuestions);
 
@@ -153,6 +152,10 @@ class QuestionServiceTest {
 
         assertThat(result).isTrue();
         verify(vectorStore).similaritySearch(any(SearchRequest.class));
+    }
+
+    private GenerateQuestionRequest generateQuestionRequest() {
+        return new GenerateQuestionRequest(Category.ARTIFICIAL_INTELLIGENCE, 2, LlmProvider.OLLAMA_LLAMA_3_2);
     }
 
 }

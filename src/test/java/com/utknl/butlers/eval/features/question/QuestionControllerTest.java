@@ -1,10 +1,13 @@
 package com.utknl.butlers.eval.features.question;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utknl.butlers.eval.core.exception.DuplicateQuestionException;
 import com.utknl.butlers.eval.core.exception.LlmGenerationException;
+import com.utknl.butlers.eval.core.factory.LlmProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -13,8 +16,10 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -30,6 +35,13 @@ class QuestionControllerTest {
     @MockitoBean
     private QuestionMapper questionMapper;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private GenerateQuestionRequest generateQuestionRequest() {
+        return new GenerateQuestionRequest(Category.ARTIFICIAL_INTELLIGENCE, 2, LlmProvider.OLLAMA_LLAMA_3_2);
+    }
+
     @Test
     void givenValidRequest_whenGenerate_thenReturns200WithQuestion() throws Exception {
         UUID questionId = UUID.randomUUID();
@@ -38,7 +50,7 @@ class QuestionControllerTest {
         Question question = Question.builder()
                 .id(questionId)
                 .content("What is polymorphism?")
-                .category("Programming")
+                .category(Category.ARTIFICIAL_INTELLIGENCE)
                 .complexityScore(3)
                 .model("llama3.2:1b")
                 .createdAt(now)
@@ -48,28 +60,32 @@ class QuestionControllerTest {
                 questionId,
                 "llama3.2:1b",
                 "What is polymorphism?",
-                "Programming",
+                Category.ARTIFICIAL_INTELLIGENCE,
                 3,
                 now
         );
 
-        when(questionService.generateQuestion()).thenReturn(question);
+        when(questionService.generateQuestion(any())).thenReturn(question);
         when(questionMapper.toResponse(question)).thenReturn(response);
 
-        mockMvc.perform(get("/generate"))
+        mockMvc.perform(post("/generate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(generateQuestionRequest())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").value("What is polymorphism?"))
-                .andExpect(jsonPath("$.category").value("Programming"))
+                .andExpect(jsonPath("$.category").value(Category.ARTIFICIAL_INTELLIGENCE.name()))
                 .andExpect(jsonPath("$.complexityScore").value(3))
                 .andExpect(jsonPath("$.model").value("llama3.2:1b"));
     }
 
     @Test
     void givenDuplicateQuestion_whenGenerate_thenReturns409() throws Exception {
-        when(questionService.generateQuestion())
+        when(questionService.generateQuestion(any()))
                 .thenThrow(new DuplicateQuestionException("Similar content already exists."));
 
-        mockMvc.perform(get("/generate"))
+        mockMvc.perform(post("/generate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(generateQuestionRequest())))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.status").value(409))
                 .andExpect(jsonPath("$.message").value("Similar content already exists."));
@@ -77,10 +93,12 @@ class QuestionControllerTest {
 
     @Test
     void givenLlmFailure_whenGenerate_thenReturns500() throws Exception {
-        when(questionService.generateQuestion())
+        when(questionService.generateQuestion(any()))
                 .thenThrow(new LlmGenerationException("LLM returned a null question candidate."));
 
-        mockMvc.perform(get("/generate"))
+        mockMvc.perform(post("/generate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(generateQuestionRequest())))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.status").value(500))
                 .andExpect(jsonPath("$.message").value("LLM returned a null question candidate."));
@@ -95,7 +113,7 @@ class QuestionControllerTest {
         Question q1 = Question.builder()
                 .id(id1)
                 .content("Question 1")
-                .category("Cat1")
+                .category(Category.ARTIFICIAL_INTELLIGENCE)
                 .complexityScore(2)
                 .model("model1")
                 .createdAt(now)
@@ -104,7 +122,7 @@ class QuestionControllerTest {
         Question q2 = Question.builder()
                 .id(id2)
                 .content("Question 2")
-                .category("Cat2")
+                .category(Category.ARTIFICIAL_INTELLIGENCE)
                 .complexityScore(4)
                 .model("model2")
                 .createdAt(now)
@@ -112,8 +130,8 @@ class QuestionControllerTest {
 
         List<Question> questions = List.of(q1, q2);
         List<QuestionResponse> responses = List.of(
-                new QuestionResponse(id1, "model1", "Question 1", "Cat1", 2, now),
-                new QuestionResponse(id2, "model2", "Question 2", "Cat2", 4, now)
+                new QuestionResponse(id1, "model1", "Question 1", Category.ARTIFICIAL_INTELLIGENCE, 2, now),
+                new QuestionResponse(id2, "model2", "Question 2", Category.ARTIFICIAL_INTELLIGENCE, 4, now)
         );
 
         when(questionService.getAllQuestions()).thenReturn(questions);

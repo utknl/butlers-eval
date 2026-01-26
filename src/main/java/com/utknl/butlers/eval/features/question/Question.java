@@ -30,7 +30,7 @@ public class Question {
     private String content;
 
     @Column(nullable = false)
-    private String category;
+    private Category category;
 
     private int complexityScore;
 

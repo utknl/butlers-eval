@@ -32,19 +32,21 @@ public class QuestionService {
     private final LlmProperties llmProperties;
 
     @Value("classpath:/prompts/generator-prompt.md")
-    private Resource generatorPromptResource;
+    private Resource generatorSystemPromptResource;
     @Value("classpath:/references/question-references.json")
     private Resource referenceResource;
 
     @Transactional
-    public Question generateQuestion() {
+    public Question generateQuestion(GenerateQuestionRequest request) {
         log.info("Generating question with: {}", llmProperties.generator().getModelId());
 
         QuestionCandidate candidate = clientFactory.getClient(llmProperties.generator())
                 .prompt()
-                .system(generatorPromptResource)
+                .system(sp -> sp.text(generatorSystemPromptResource)
+                        .param("category", request.category().name())
+                        .param("complexity", request.complexityLevel()))
                 .user(u -> u.text("""
-                        Here are existing questions as a JSON array.
+                        Here are reference questions as a JSON array.
                         Use them only as reference for style and diversity.
                         Do not duplicate them.
                         
@@ -100,7 +102,7 @@ public class QuestionService {
         if (candidate.content() == null || candidate.content().isBlank()) {
             throw new LlmGenerationException("LLM returned an empty or null question content.");
         }
-        if (candidate.category() == null || candidate.category().isBlank()) {
+        if (candidate.category() == null) {
             throw new LlmGenerationException("LLM returned an empty or null question category.");
         }
         if (candidate.complexityScore() < 1 || candidate.complexityScore() > 5) {

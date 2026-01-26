@@ -1,32 +1,27 @@
 [
   {
-    "content": "Explain the difference between deep and shallow copying in Java.",
-    "category": "Programming",
-    "complexityScore": 3
-  },
-  {
-    "content": "What are the socio-economic impacts of high-speed rail in urban centers?",
-    "category": "Social Science",
+    "content": "Explain the concept of 'Time Dilation' in Einstein's Special Relativity and how it affects GPS satellite clocks.",
+    "category": "SPACE_EXPLORATION",
     "complexityScore": 4
   },
   {
-    "content": "Solve for x: 2x^2 - 5x + 3 = 0.",
-    "category": "Mathematics",
+    "content": "What is the 'Bystander Effect' in social psychology, and what are the primary factors that contribute to it?",
+    "category": "PSYCHOLOGY",
+    "complexityScore": 3
+  },
+  {
+    "content": "How does the '50/30/20 Rule' help in personal budgeting, and what specifically does the 20% represent?",
+    "category": "PERSONAL_FINANCE",
     "complexityScore": 2
   },
   {
-    "content": "Describe the process of oxidative phosphorylation in the mitochondria.",
-    "category": "Biology",
+    "content": "Describe the process of 'CRISPR-Cas9' gene editing and its potential implications for treating hereditary diseases.",
+    "category": "BIOLOGY_HEALTH",
     "complexityScore": 5
   },
   {
-    "content": "Who wrote the 1924 novel 'The Magic Mountain'?",
-    "category": "Literature",
-    "complexityScore": 2
-  },
-  {
-    "content": "What were the main causes of the French Revolution?",
-    "category": "History",
-    "complexityScore": 3
+    "content": "Identify the primary causes of the 'Bronze Age Collapse' around 1200 BCE and its impact on Eastern Mediterranean civilizations.",
+    "category": "WORLD_HISTORY",
+    "complexityScore": 4
   }
 ]

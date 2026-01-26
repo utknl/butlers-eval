@@ -23,6 +23,7 @@ public class ChatClientFactory {
 
         return baseClient.mutate().defaultOptions(ChatOptions.builder()
                         .model(provider.getModelId())
+                        .maxTokens(2000)
                         .build())
                 .defaultAdvisors(AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT)
                 .build();

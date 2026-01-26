@@ -6,7 +6,7 @@ import java.util.UUID;
 public record QuestionResponse(UUID id,
                                String model,
                                String content,
-                               String category,
+                               Category category,
                                int complexityScore,
                                LocalDateTime createdAt) {
 }
